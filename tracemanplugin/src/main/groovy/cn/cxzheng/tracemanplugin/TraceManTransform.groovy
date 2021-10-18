@@ -1,20 +1,13 @@
 package cn.cxzheng.tracemanplugin
 
-import com.android.build.api.transform.DirectoryInput
-import com.android.build.api.transform.Format
-import com.android.build.api.transform.JarInput
-import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.Transform
-import com.android.build.api.transform.TransformException
-import com.android.build.api.transform.TransformInput
-import com.android.build.api.transform.TransformInvocation
-import com.android.build.api.transform.TransformOutputProvider
+import cn.cxzheng.tracemanplugin.Config
+import cn.cxzheng.tracemanplugin.TraceClassVisitor
+import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
 import org.gradle.api.Project
-import cn.cxzheng.tracemanplugin.Config
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
@@ -24,10 +17,8 @@ import java.util.jar.JarEntry
 import java.util.jar.JarFile
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
-import cn.cxzheng.tracemanplugin.TraceClassVisitor
 
 import static org.objectweb.asm.ClassReader.EXPAND_FRAMES
-
 /**
  * custom transform: tranform classes before dex
  * inputType、scope、isIncremental主要根据 task:transformClassesWithDex来设定
@@ -110,7 +101,7 @@ class TraceManTransform extends Transform {
                 if (traceConfig.isNeedTraceClass(name)) {
                     ClassReader classReader = new ClassReader(file.bytes)
                     ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
-                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM5, classWriter, traceConfig)
+                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM6, classWriter, traceConfig)
                     classReader.accept(cv, EXPAND_FRAMES)
                     byte[] code = classWriter.toByteArray()
                     FileOutputStream fos = new FileOutputStream(
@@ -157,7 +148,7 @@ class TraceManTransform extends Transform {
                     jarOutputStream.putNextEntry(zipEntry)
                     ClassReader classReader = new ClassReader(IOUtils.toByteArray(inputStream))
                     ClassWriter classWriter = new ClassWriter(classReader, ClassWriter.COMPUTE_MAXS)
-                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM5, classWriter, traceConfig)
+                    ClassVisitor cv = new TraceClassVisitor(Opcodes.ASM6, classWriter, traceConfig)
                     classReader.accept(cv, EXPAND_FRAMES)
                     byte[] code = classWriter.toByteArray()
                     jarOutputStream.write(code)

@@ -24,13 +24,20 @@ class WebScoketHandler : IWebScoketHandler {
             }
             "StartMethodCost" -> {
                 LogUtil.i("接收到消息：开始方法耗时统计")
-                isActiveTraceMan = true
-                MethodCostHelper.startMethodCost()
+                if (isActiveTraceMan) {
+                    isActiveTraceMan = false
+                    MethodCostHelper.endMethodCost()
+                } else {
+                    isActiveTraceMan = true
+                    MethodCostHelper.startMethodCost()
+                }
             }
             "EndMethodCost" -> {
                 LogUtil.i("接收到消息：结束方法耗时统计")
-                isActiveTraceMan = false
-                MethodCostHelper.endMethodCost()
+                if (isActiveTraceMan) {
+                    isActiveTraceMan = false
+                    MethodCostHelper.endMethodCost()
+                }
             }
 
         }
